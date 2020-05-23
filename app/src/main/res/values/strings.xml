@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Stryker</string>
+    <string name="open_camera">Open Camera</string>
+    <string name="capture_image">Capture Image</string>
+    <string name="record_audio">Record Audio</string>
+    <string name="record_audio_and_click_images">Record Audio And Click Images</string>
 </resources>

@@ -26,8 +26,8 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
     private var mCustomPermission: List<String>? = null
     private var mPerpermissionListener:PermissionListener? = null
 
-    var REQUEST_TAKE_PHOTO = 5
-    val REQUEST_IMAGE_PICKER = 3
+    private var REQUEST_TAKE_PHOTO = 5
+    private val REQUEST_IMAGE_PICKER = 3
     private var cameraUri : Uri? = null
     private var imagesAdapter: ImageAdapter? =null
     private val clickedImageList = ArrayList<ClickedImage>()
@@ -36,10 +36,12 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
+        //setting up recycler view
         imagesAdapter = ImageAdapter(ArrayList<ClickedImage>())
         rv_image?.layoutManager = LinearLayoutManager(this)
         rv_image?.adapter = imagesAdapter
 
+        //asking user for run time permission
         iv_upload_image?.setOnClickListener {
             val multiplePermission = java.util.ArrayList<String>()
             multiplePermission.add(Manifest.permission.CAMERA)
@@ -49,9 +51,8 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
                 imagePicker()
             }
         }
-
-
     }
+
     fun checkAndRequestPermission(
         activity: Activity,
         permissions: List<String>,
@@ -83,6 +84,8 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
         }
         return true
     }
+
+    //pops up dialog for user to choose options
     private fun imagePicker() {
         val options = arrayOf("Take Photo","Choose from Gallery")
         val builder = AlertDialog.Builder(this)
@@ -96,12 +99,16 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
         }
         builder.show()
     }
+
+    //opens image picker if permission is granted
     override fun onPermissionGranted(mCustomPermission: List<String?>?) {
         imagePicker()
     }
 
     override fun onPermissionDenied(mCustomPermission: List<String?>?) {
     }
+
+    //opens camera
     private fun takePhotoIntent() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if(intent.resolveActivity(this.packageManager)!=null){
@@ -117,12 +124,14 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
         }
     }
 
+    //choosing file from gallery
     private fun chooseFromGalleryIntent() {
         val getIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         getIntent.type = "image/*"
         startActivityForResult(getIntent, REQUEST_IMAGE_PICKER)
     }
 
+    //creating file name for image at storage
     @Throws(IOException::class)
     private fun createImageFile(): Uri? {
         val imageFileName ="temp_capture"
@@ -132,6 +141,8 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        //for image picked from gallery
         if(requestCode == REQUEST_IMAGE_PICKER && resultCode==Activity.RESULT_OK && data!=null){
             try{
                 val imagePath = getRealPathFromURI(this,data.data) as Uri
@@ -142,6 +153,7 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
                 e.printStackTrace()
             }
         }else if(requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK){
+            //for image clicked with camera
             try{
                 val intent = CropImage.activity(cameraUri).getIntent(this)
                 startActivityForResult(intent, CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE)
@@ -150,6 +162,7 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
                 ex.printStackTrace()
             }
         }else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            //for getting cropped image
             val result = CropImage.getActivityResult(data)
             if (resultCode == Activity.RESULT_OK) {
                 val resultUri = result.getUri()
@@ -180,6 +193,7 @@ class ImageActivity : AppCompatActivity(),PermissionListener {
         return Uri.fromFile(File(result!!))
     }
 
+    //image set at adapter to view in recycler view
     private fun uploadImageApi(path: String) {
         val file = File(path)
         val clickedImage = ClickedImage()

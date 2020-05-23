@@ -10,7 +10,7 @@
         android:id="@+id/iv_upload_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open Camera"
+        android:text="@string/open_camera"
         android:layout_marginTop="@android:dimen/app_icon_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
